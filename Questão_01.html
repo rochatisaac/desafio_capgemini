@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<header>
+  
+  <style>
+    p{
+      margin:0;
+    }
+  </style>
+
+</header>
+<body>
+  <input type="text" 
+          id="value">
+
+  <button id="btn">
+    Generate Asterisks
+  </button>
+  
+  <div id=display>
+  </div>
+
+  <script>
+
+    //declara constantes para manipulação do documento(DOM)
+    const [$DISP, $BTN, $VALUE] = [
+                                  document.querySelector('#display'), 
+                                  document.querySelector('#btn'),
+                                  document.querySelector('#value')
+                                  ];
+
+    //dispara a função addAsterisks a partir do clicar no botão
+    $BTN.addEventListener('click',addAsterisks)                              
+
+    function addAsterisks(){
+
+      //enquanto houverem $DISP childs, o loop as removerá para limpar a página
+      while ($DISP.firstChild) {
+        $DISP.removeChild($DISP.firstChild);
+      }
+
+      //declara SPACES e LINES como arrays vazias e asterisk como uma variável do tipo string também vazia
+      const [LINES,SPACES] = [[],[]];
+      let asterisks = '';
+        
+        //incia um loop usando o valor da tag <input> como referecia de vezes à rodar
+        for(let i = 0;i<$VALUE.value;i++){
+          //push mais uma linha para o array LINES, que será usado como referência de linhas necessárias para a pirâmide de asteríscos
+          LINES.push(i);
+          //push mais um espaço para o array SPACES para servir de referência nas linhas de asteríscos
+          SPACES.push("&nbsp"); //&nbsp é um caractere especial vazio, servirá como espaço em branco
+        }
+
+      //remove um expaço extra que acabou sendo gerado no loop anterior
+        SPACES.pop();
+      
+      //para cada index do array LINES, a função repetirá as ações a seguir
+        LINES.forEach(item=>{
+          //cria um elemento <p> para ser incluído no documento
+          let p = document.createElement("p");
+          //concatena ao valor da variável asterisks mais um "*"
+          asterisks=asterisks+'*';
+          //concatena os espaços do array SPACES à esquerda da variável asterisks e atribui este valor ao elemento <p> gerado anteriormente
+          p.innerHTML=SPACES.join('')+asterisks;
+          //inclui o novo elemento <p> no documento como um child da <div> display, exibindo este documento logo após o child anterior
+          $DISP.appendChild(p)
+          //remove mais um espaço do array SPACES para garantir o formato de pirâmide
+          SPACES.pop();
+        })
+    }
+
+  </script>
+</body>

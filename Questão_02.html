@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<header>
+  
+  <style>
+    p{
+      color:red;
+    }
+  </style>
+
+</header>
+<body>
+
+  <input type="text" 
+          id="pass">
+
+  <button id="btn">
+    Password Check
+  </button>
+  
+  <div id=display>
+  </div>
+
+  <script>    
+    //declara constantes para manipulação do documento(DOM)
+    const $DISPLAY = document.querySelector('#display')
+    const $PASS = document.querySelector('#pass');
+    const $BTN = document.querySelector('#btn');
+    
+    //dispara a função passwordCheck a partir do clique do botão
+    $BTN.addEventListener('click',passwordCheck)
+    
+    //declara as variáveis utilizadas para rastrear a checagem de requisitos do password inicialmente com valor de false
+    let [ foundSpecial,
+          foundLowerCase,
+          foundUpperCase,
+          foundNumber,
+          minimalLength] = [false, false, false, false, false]
+    
+    //realiza a checagem do password
+    function passwordCheck(){
+      //declara a variável password com valor da checkbox da tag <input>
+      const password = $PASS.value;
+      //apaga as mensagens sobre a senha e zera as variáveis
+      tryNewPass();
+      //transforma a variável em array e roda um loop para cada índice(caractere)
+      password.split('').forEach(letter=>{
+        //confere se o caractere é especial
+        haveSpecialChar(letter);
+        //confere se o caractere é letra minúscula
+        haveLowerCase(letter);
+        //confere se o caractere é letra maiúscula
+        haveUpperCase(letter);
+        //confere se o caractere é um numero
+        haveNumber(letter);
+      })
+      //verifica se o password possui ao menos 6 caracteres. Caso positivo, muda o estado da variável para true
+      if(password.length>=6){
+        minimalLength=true
+      }
+      //são realizadas checagens das variáveis. Caso alguma aponte como false, uma mensagem mostrará o que falta para o password ser aceito. Caso todas sejam true, uma mensagem em verde apontará que o password foi aceito
+      //para todas as checagens de variáveis, caso a condição seja verdadeira, será gerado um elemento <p> que será atribuido como child da <div> display e conterá uma mensagem a ser impressa no documento
+      if(!foundSpecial){
+        let p = document.createElement("p");
+          p.innerHTML="You must use at least one special character";
+          $DISPLAY.appendChild(p)
+      }if(!foundLowerCase){
+        let p = document.createElement("p");
+          p.innerHTML="You must use at least one lower case character";
+          $DISPLAY.appendChild(p)
+      }if (!foundUpperCase){
+        let p = document.createElement("p");
+          p.innerHTML="You must use at least one upper case character";
+          $DISPLAY.appendChild(p)
+      }if(!foundNumber){
+        let p = document.createElement("p");
+          p.innerHTML="You must use at least one number";
+          $DISPLAY.appendChild(p)
+      }if(!minimalLength){
+        let p = document.createElement("p");
+          p.innerHTML=`Your password must have at least 6 characters. Add ${6-$PASS.value.length} more characters`;
+          $DISPLAY.appendChild(p)
+      } if (foundSpecial&&
+            foundLowerCase&&
+            foundUpperCase&&
+            foundNumber&&
+            minimalLength){
+          $DISPLAY.innerHTML="<p style='color:green'>Password Accepted!</p>"
+       }
+    }
+    //aqui é checado se o caractere é um dos especiais aceitos para o password
+    function haveSpecialChar(letter){
+      //a constante special é um array cujo os índices contem os caracteres especiais aceitos para password
+      const special = '!@#$%^&*()-+'.split('');//split transforma a inicialmente string em array
+        if (special.find(char=>letter===char)){
+          //caso o caractere seja especial, a variável foundSpecial terá valor de true. Caso contrário, ela permanecerá sem alterações.
+          foundSpecial = true;
+        }
+    }
+    function haveLowerCase(letter){
+      //o protótipo.test() busca em um regex (que agrega um conjunto de letras minusculas de "a à z") o caractere passado no parâmetro
+      if(/[a-z]/.test(letter)){
+        //se o caractere for encontrado no conjunto, foundLowerCase tem seu valor alterado para true
+        foundLowerCase=true;
+      }
+    }
+    //a função haveUpperCase segue a mesma lógica da haveLowerCase, porém, com letras maiúsculas
+    function haveUpperCase(letter){
+      if(/[A-Z]/.test(letter)){
+        foundUpperCase=true;
+      }
+    }
+    function haveNumber(letter){
+      //aqui é verificado se o argumento é um número. isNaN retorna true para um caractere que não é um numero. Logo, se isNaN retornar falso, o caractere é um número.
+      if(!isNaN(letter)){
+        foundNumber=true
+      }
+    }
+    function tryNewPass(){
+      //esta função remove todos os filhos da <div> $DISPLAY e retorna os valores das variáveis de referência para false
+      [ foundSpecial,
+          foundLowerCase,
+          foundUpperCase,
+          foundNumber,
+          minimalLength] = [false, false, false, false, false];
+      //enquanto houverem filhos de $DISPLAY, o loop continuará os removendo.
+      while ($DISPLAY.firstChild) {
+        $DISPLAY.removeChild($DISPLAY.firstChild);
+      }
+    }
+  
+  </script>
+</body>
