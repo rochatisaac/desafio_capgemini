@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<header>
+  
+  <style>
+    p{
+      color:red;
+    }
+  </style>
+
+</header>
+<body>
+    <input type="text" 
+            id="value">
+  
+    <button id="btn">
+      Check for Anagrams
+    </button>
+    
+    <div id=display>
+    </div>
+  
+<script>
+  
+    //declara constantes para manipulação do documento(DOM)
+    const [$DISP, $BTN, $VALUE] = [
+                                document.querySelector('#display'), 
+                                document.querySelector('#btn'),
+                                document.querySelector('#value')
+                                ];
+
+
+    //dispara a função anagramFinder a partir do clicar no botão
+    $BTN.addEventListener('click',anagramFinder)       
+
+    function anagramFinder(word){
+    //declara o valor de word como o valor inserido dentro do input
+    word=$VALUE.value
+    
+    //enquanto houverem $DISP childs, o loop as removerá para limpar a página
+        while ($DISP.firstChild) {
+    $DISP.removeChild($DISP.firstChild);
+    }
+
+    //declaradas variáveis que serão utilizadas para controlar os loops(i e j) while, contar anagramas(count) e organizar as substrings(STRINGBOX)
+    let STRINGBOX=[];
+    let i=0;
+    let j=1;
+    let count = 0;
+    //este loop roda enquanto i for menor que o comprimento da palavra 
+    while(i<=word.length){
+        //este loop roda enquanto j for menor que o comprimento da palavra 
+        while(j<=word.length){
+        //a ideia aqui é simples: a variável cutter irá "cortar" a palavra incialmente em grupos de uma letra, depois de 2 letras, depois 3 letras até o fim da palavra
+        const cutter = word.slice(i,j);
+        //cada valor de cut será armazenado na STRINGBOX
+        STRINGBOX.push(cutter);
+        //aqui apenas o j tera seu valor acrescido. Desta forma, garantimos que cada letra que inicie no indice "i" terá um conjunto de letras abarcando toda a palavra. 
+        //Exemplo: para a palavra "ovo", será armazenado primeiro "o", depois "ov", e por fim "ovo"
+        //a ideia é de que, no proximo loop de 'i', o procedimento se repita, porem, com a letra 'v' de inicio. Exemplo: "v", depois, "vo".
+        j++;
+        }
+        //ao encerrar o loop da letra 'i', o loop reiniará na letra seguinte (i+1), até o fim da palavra
+        i++;
+        //à variável j, é atribuido o valor de i+1. Assim, garantimos que, no próximo loop de "j", o cutter iniciará cortando apenas uma letra
+        j=i+1
+    }
+
+    //transformam-se aqui as substrings do array STRINGBOX em letra minúscula, evitando erros na comparação futura
+    STRINGBOX = STRINGBOX.map(substring=>substring.toLowerCase());
+
+
+    //este é o loop responsável por verificar se as substrings contidas na STRINGBOX possuem anagramas
+    //a ideia aqui é que, enquanto o loop "i" corra da esquerda para a direita, o "j" faça o caminho inverso
+    //quando o valor de 'i' for maior que a metade do array STRINGBOX, o loop 'i' para
+    for(let i= 0; i<STRINGBOX.length;i++){
+        
+        //aqui o item correspondente ao index 'i' do array STRINGBOX é transformado em uma "sub-substring" contendo apenas letras
+        const substringLetters=STRINGBOX[i].split('');
+        //começa então o loop 'j', percorrendo o caminho inverso ao loop 'i'. Espera-se que o loop finalize quando ambas as variáveis "toCompare" e "substringLetter" estejam no meso index da STRINGBOX
+        for(let j=STRINGBOX.length-1;j>i;j--){   
+        const toCompare=STRINGBOX[j].split('');
+        //aqui é realizada a primeira validação. Esta execução apenas prosseguirá caso subrstringLetters e toCompare tenham o mesmo comprimento
+        if(substringLetters.length===toCompare.length){
+        //checkEqual executa uma validação letra por letra nos arrays passados como argumentos. Mais detalhes abaixo 
+        if(checkEqual(substringLetters,toCompare)){
+            //validadas as condições acima, o contado é acrescido +1
+            count++
+        }
+        }
+        }
+    }
+
+    //verifica se todas as letras de ambos arrays se repetem
+    function checkEqual(array1,array2){
+        //as constantes remaped1 e 2 mapearão os array1 e array2, preparando-os para verificação de repetição
+        const remaped1=remapArray(array1);
+        const remaped2=remapArray(array2);
+        //verifica-se cada elemento do remaped1 e os compara com o remaped2. O elemento se repetir em ambos arrays a mesma quantidade de vezes, a verificação retorna true. Outro caso, retorna false
+        if(remaped1.every(element=>{
+            //aqui busca-se no remaped2 o elemento destacado no remaped1. Verifica-se se este foi encontrado e se suas ocorrencias são semelhantes. Assim, evitam-se erros no algoritmo para o caso de arrays com mesmo comprimento e letras, mas com repetições de letras diferentes.
+            const confirmOccurrencies = remaped2.find(letter=>letter.name===element.name&&letter.occurrencies===element.occurrencies);
+            if(confirmOccurrencies){
+                return true
+            }
+            return false
+        })){
+            return true
+        }
+    }
+    //a função remapArray auxiliará a função checkEqual atribundo valores às constantes remaped1 e remaped2
+    function remapArray(array){
+        //esta função retornará arrays com as mesmas letras do argumento, porém, transformando-as em objetos com a quantidade de vezes que estas aparecem no array. Desta forma, evitam-se erros de falso positivo em relação  a diferentes ocorrências nos arrays comparados.
+        return array.reduce((acc,item)=>{
+                const register = acc.find(letter=>letter.name===item);
+                if(register){
+                    register.occurrencies++
+                } else{
+                    acc.push({
+                        name:item,
+                        occurrencies:1
+                    })
+                }
+                return acc
+            },[])
+    }
+    //ao fim da função, executa printResult com o valor de count
+    printResult(count);
+
+    }
+    //imprime o resultado no corpo do documento
+    function printResult(number){
+        let p = document.createElement("p");
+        p.innerHTML=number;
+        $DISP.appendChild(p)
+    }
+
+  </script>
+</body>
